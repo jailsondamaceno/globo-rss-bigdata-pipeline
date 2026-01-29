@@ -26,9 +26,7 @@ lista_noticias = []
 
 # Percorrer cada notícia em f.entries
 for news in f.entries:
-    # print(news.keys())
-    # break
-
+    
     data_publicada = news.get('published_parsed')
 
     if data_publicada:
