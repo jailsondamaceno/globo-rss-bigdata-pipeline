@@ -1,23 +1,18 @@
 # RSS/API crawler placeholder
 # Implement fetch_rss() and save_raw_json()
 
-import requests # Biblioteca para fazer requisições HTTP
-import feedparser # Biblioteca para interpretar RSS/XML
+import requests
+import feedparser 
 import json
 from datetime import datetime, date
 
-data_hoje = date.today().strftime('%Y-%m-%d')
-nome_arquivo = 'data/raw/noticias_' + data_hoje + '.json'
-
-# ===== Coleta ===== entra url
-url = 'https://g1.globo.com/dynamo/rss2.xml'
-
+#Função de coleta: recebe URL, retorna RSS
 def coleta_rss(url):
     r = requests.get(url)
     return r.text
 
 
-# ===== Transformação ===== sai rss_text
+# Transforma RSS bruto em lista de notícias estruturadas
 def transforma_rss(rss_text):
     feed = feedparser.parse(rss_text)
 
@@ -50,3 +45,18 @@ def transforma_rss(rss_text):
 def persistencia_rss(lista_noticias, nome_arquivo):
     with open(nome_arquivo, "w", encoding="utf-8") as arquivo:
         json.dump(lista_noticias, arquivo, ensure_ascii=False, indent=4)
+
+def main():
+    url = "https://g1.globo.com/dynamo/rss2.xml"
+
+    rss_text = coleta_rss(url)
+    lista_noticias = transforma_rss(rss_text)
+
+    data_hoje = date.today().strftime("%Y-%m-%d")
+    nome_arquivo = f"data/raw/noticias_{data_hoje}.json"
+
+    persistencia_rss(lista_noticias, nome_arquivo)
+
+if __name__ == "__main__":
+    main()
+
