@@ -9,37 +9,44 @@ from datetime import datetime, date
 data_hoje = date.today().strftime('%Y-%m-%d')
 nome_arquivo = 'data/raw/noticias_' + data_hoje + '.json'
 
-# ===== Coleta =====
+# ===== Coleta ===== entra url
 url = 'https://g1.globo.com/dynamo/rss2.xml'
 
-r = requests.get(url)
+def coleta_rss(url):
+    r = requests.get(url)
+    return r.text
 
-# ===== Transformação =====
-f = feedparser.parse(r.text)
 
-primeira_noticia = f.entries[0]
+# ===== Transformação ===== sai rss_text
+def transforma_rss(rss_text):
+    feed = feedparser.parse(rss_text)
 
-lista_noticias = []
+    lista_noticias = []
 
-# ===== Persistência =====
-for news in f.entries:
-    
-    data_publicada = news.get('published_parsed')
+    for news in feed.entries:
+        data_publicada = news.get("published_parsed")
 
-    if data_publicada:
-        published_at = f"{data_publicada.tm_year}-{data_publicada.tm_mon:02d}-{data_publicada.tm_mday:02d}"
-    else:
-        published_at = None
+        if data_publicada:
+            published_at = (
+                f"{data_publicada.tm_year}-"
+                f"{data_publicada.tm_mon:02d}-"
+                f"{data_publicada.tm_mday:02d}"
+            )
+        else:
+            published_at = None
 
-    noticia = {
-    "title": news['title'],
-    "link": news['link'],
-    "summary": news.get('summary'),
-    "published_at" : published_at
-    
-}
-    lista_noticias.append(noticia)
-    
+        noticia = {
+            "title": news["title"],
+            "link": news["link"],
+            "summary": news.get("summary"),
+            "published_at": published_at
+        }
 
-with open(nome_arquivo, "w", encoding="utf-8") as arquivo:
-    json.dump(lista_noticias, arquivo, ensure_ascii=False, indent=4)
+        lista_noticias.append(noticia)
+
+    return lista_noticias
+
+# # ===== Persistência =====
+def persistencia_rss(lista_noticias, nome_arquivo):
+    with open(nome_arquivo, "w", encoding="utf-8") as arquivo:
+        json.dump(lista_noticias, arquivo, ensure_ascii=False, indent=4)
