@@ -9,22 +9,19 @@ from datetime import datetime, date
 data_hoje = date.today().strftime('%Y-%m-%d')
 nome_arquivo = 'data/raw/noticias_' + data_hoje + '.json'
 
-#URL do feed RSS do G1
+# ===== Coleta =====
 url = 'https://g1.globo.com/dynamo/rss2.xml'
 
-# Coleta e processa notícias do RSS do G1
 r = requests.get(url)
 
-#Interpreta o RSS e transforma em estrutura Python
+# ===== Transformação =====
 f = feedparser.parse(r.text)
 
-# Seleciona a primeira notícia do feed
 primeira_noticia = f.entries[0]
 
-# Criar uma lista vazia para armazenar as notícias
 lista_noticias = []
 
-# Percorrer cada notícia em f.entries
+# ===== Persistência =====
 for news in f.entries:
     
     data_publicada = news.get('published_parsed')
